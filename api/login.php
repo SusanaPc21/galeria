@@ -1,21 +1,32 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 include "conexion.php";
 
-$data = json_decode(file_get_contents("php://input"));
+// Leer la entrada JSON
+$input = file_get_contents("php://input");
+$data = json_decode($input, true); // `true` para obtener un array asociativo
 
-$usuario = $data->usuario;
-$password = $data->password;
+if (!isset($data['usuario']) || !isset($data['password'])) {
+    echo json_encode(["status" => "error", "message" => "Datos incompletos"]);
+    exit();
+}
 
-$sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND password = '$password'";
-$result = $conn->query($sql);
+$usuario = $data['usuario'];
+$password = $data['password'];
+
+// Usar consultas preparadas para evitar SQL Injection
+$sql = $conn->prepare("SELECT * FROM usuarios WHERE usuario = ? AND password = ?");
+$sql->bind_param("ss", $usuario, $password);
+$sql->execute();
+$result = $sql->get_result();
 
 if ($result->num_rows > 0) {
     echo json_encode(["status" => "success"]);
 } else {
-    echo json_encode(["status" => "fail"]);
+    echo json_encode(["status" => "fail", "message" => "Usuario o contraseña incorrectos"]);
 }
 
 $conn->close();

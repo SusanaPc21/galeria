@@ -9,7 +9,7 @@ function App() {
     e.preventDefault();
 
     try {
-      const response = await fetch('../api/login.php', {
+      const response = await fetch('http://localhost/galeria/api/login.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,6 +19,10 @@ function App() {
           password: password
         })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
@@ -32,7 +36,7 @@ function App() {
 
     } catch (error) {
       console.error('Error en la conexión:', error);
-      setMensaje('❌ Error al conectar con el servidor.');
+      setMensaje(`❌ Error al conectar con el servidor: ${error.message}`);
     }
   };
 
