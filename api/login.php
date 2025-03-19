@@ -5,9 +5,8 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 include "conexion.php";
 
-// Leer la entrada JSON
 $input = file_get_contents("php://input");
-$data = json_decode($input, true); // `true` para obtener un array asociativo
+$data = json_decode($input, true);
 
 if (!isset($data['usuario']) || !isset($data['password'])) {
     echo json_encode(["status" => "error", "message" => "Datos incompletos"]);
@@ -17,16 +16,16 @@ if (!isset($data['usuario']) || !isset($data['password'])) {
 $usuario = $data['usuario'];
 $password = $data['password'];
 
-// Usar consultas preparadas para evitar SQL Injection
-$sql = $conn->prepare("SELECT * FROM usuarios WHERE usuario = ? AND password = ?");
+$sql = $conn->prepare("SELECT rol FROM usuarios WHERE usuario = ? AND password = ?");
 $sql->bind_param("ss", $usuario, $password);
 $sql->execute();
 $result = $sql->get_result();
 
-if ($result->num_rows > 0) {
-    echo json_encode(["status" => "success"]);
+if ($row = $result->fetch_assoc()) {
+    echo json_encode(["status" => "success", "rol" => $row['rol']]); // Retorna el rol
 } else {
     echo json_encode(["status" => "fail", "message" => "Usuario o contraseña incorrectos"]);
 }
 
 $conn->close();
+
