@@ -16,7 +16,7 @@ if (!isset($data['usuario']) || !isset($data['password'])) {
 $usuario = $data['usuario'];
 $password = $data['password'];
 
-$sql = $conn->prepare("SELECT rol FROM usuarios WHERE usuario = ? AND password = ?");
+$sql = $conn->prepare("SELECT rol FROM usuarios WHERE nombre_usuario = ? AND password = ?");
 $sql->bind_param("ss", $usuario, $password);
 $sql->execute();
 $result = $sql->get_result();
@@ -29,3 +29,4 @@ if ($row = $result->fetch_assoc()) {
 
 $conn->close();
 
+?>

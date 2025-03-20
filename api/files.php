@@ -13,11 +13,12 @@ $archivos = [];
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $archivos[] = [
-            "id" => $row["id"], // Agregamos el ID del archivo
+            "id" => $row["id"], // ID del archivo
             "ruta" => $row["ruta"],
             "nombre" => $row["nombre"],
             "fecha" => $row["fecha"],
-            "hora" => $row["hora"]
+            "hora" => $row["hora"],
+            "isSelected" => false // Campo adicional para React
         ];
     }
 }
