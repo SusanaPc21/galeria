@@ -98,6 +98,11 @@ function HomeAdmin() {
       .filter((file) => file.isSelected) // Solo los archivos marcados
       .map((file) => file.id); // Usar el ID del archivo
 
+    if (selectedFileIds.length === 0) {
+      alert("Selecciona al menos un archivo.");
+      return;
+    }
+
     console.log("Enviando:", {
       user: selectedUser,
       screen: selectedScreen,
@@ -116,11 +121,26 @@ function HomeAdmin() {
       });
 
       const result = await response.json();
-      alert(result.message);
+
+      if (response.ok) {
+        alert(result.message);
+
+        // Limpiar selects
+        setSelectedUser('');
+        setSelectedScreen('');
+
+        // Desmarcar todos los archivos seleccionados
+        setFiles((prevFiles) =>
+          prevFiles.map((file) => ({ ...file, isSelected: false }))
+        );
+      } else {
+        alert(result.message || "Error al asignar la pantalla.");
+      }
     } catch (error) {
-      alert('Hubo un problema al asignar la pantalla.');
+      alert("Hubo un problema al asignar la pantalla.");
     }
   };
+
 
 
   // PARTE CREAR PANTALLA
