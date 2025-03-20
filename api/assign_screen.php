@@ -1,36 +1,41 @@
 <?php
-include 'conexion.php';
 
-header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
 
-$data = json_decode(file_get_contents('php://input'), true);
-
-$idUsuario = $data['user'] ?? null;
-$idPantalla = $data['screen'] ?? null;
-
-// Validar que los datos existan
-if (!$idUsuario || !$idPantalla) {
-    echo json_encode(['success' => false, 'message' => 'Usuario y pantalla son requeridos.']);
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit;
 }
 
-try {
-    // Verificar si la asignación ya existe (opcional pero recomendable)
-    $stmt = $conn->prepare("SELECT * FROM pantallas_usuarios WHERE id_usuario = ? AND id_pantalla = ?");
-    $stmt->execute([$idUsuario, $idPantalla]);
-    if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Esta pantalla ya está asignada al usuario.']);
-        exit;
-    }
+include 'conexion.php';
 
-    // Insertar nueva asignación
-    $stmt = $conn->prepare("INSERT INTO pantallas_usuarios (id_usuario, id_pantalla) VALUES (?, ?)");
-    $stmt->execute([$idUsuario, $idPantalla]);
+$data = json_decode(file_get_contents("php://input"), true);
 
-    echo json_encode(['success' => true, 'message' => 'Pantalla asignada correctamente.']);
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Error al asignar la pantalla.']);
+if (!isset($data['user'], $data['screen'], $data['selectedFiles'])) {
+    echo json_encode(["message" => "Datos incompletos"]);
+    exit;
 }
 
-$conn = null;
-?>
+$id_usuario = intval($data['user']);
+$id_pantalla = intval($data['screen']);
+$id_archivos = !empty($data['selectedFiles']) ? implode(",", array_map('intval', $data['selectedFiles'])) : "";
+
+// Verificar si id_pantalla e id_usuario son válidos
+if ($id_pantalla === 0 || $id_usuario === 0) {
+    echo json_encode(["message" => "ID de usuario o pantalla no válido"]);
+    exit;
+}
+
+$stmt = $conn->prepare("INSERT INTO asignar_pantalla (id_pantalla, id_usuario, id_archivos) VALUES (?, ?, ?)");
+$stmt->bind_param("iis", $id_pantalla, $id_usuario, $id_archivos);
+
+if ($stmt->execute()) {
+    echo json_encode(["message" => "Pantalla asignada con éxito", "id_pantalla" => $id_pantalla, "id_archivos" => $id_archivos]);
+} else {
+    echo json_encode(["message" => "Error al asignar la pantalla"]);
+}
+
+
