@@ -5,6 +5,7 @@ function HomeAdmin() {
   const [files, setFiles] = useState([]);
   const [screens, setScreens] = useState([]);
   const [users, setUsers] = useState([]);
+  const [ficheros, setFicheros] = useState([]);
   const [selectedScreen, setSelectedScreen] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [screenName, setScreenName] = useState('');
@@ -82,6 +83,17 @@ function HomeAdmin() {
       setUsers(data.users); // Actualiza el estado con los usuarios
     } catch (error) {
       console.error('Error al obtener los usuarios:', error);
+    }
+  };
+
+   // PARTE MOSTRAR FICHEROS
+  const fetchFicheros = async () => {
+    try {
+      const response = await fetch("http://localhost/galeria/api/verFicheros.php");
+      const data = await response.json();
+      setFicheros(data.ficheros); // Guardar los datos correctamente en el estado
+    } catch (error) {
+      console.error("Error al obtener los archivos:", error);
     }
   };
 
@@ -174,6 +186,7 @@ function HomeAdmin() {
     fetchFiles();
     fetchScreens();
     fetchUsers();
+    fetchFicheros();
   }, []);
 
   return (
@@ -197,7 +210,7 @@ function HomeAdmin() {
       <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)} className="border p-2 mr-2">
         <option value="">Selecciona un usuario</option>
         {users.map((user) => (
-          <option key={user.id} value={user.id}>{user.usuario}</option>
+          <option key={user.id} value={user.id}>{user.nombre_usuario}</option>
         ))}
       </select>
 
@@ -210,7 +223,7 @@ function HomeAdmin() {
 
 
       <button onClick={handleAssignScreen} className="bg-green-500 text-white p-2 rounded ml-2">Asignar</button>
-
+        {/* TABLA DE FOTOS */}
       <h2 className="text-lg font-bold mt-8">Archivos Subidos</h2>
       <table className="min-w-full bg-white border-collapse border border-gray-300">
         <thead>
@@ -242,6 +255,36 @@ function HomeAdmin() {
               <td className="px-4 py-2 border">{file.hora}</td>
             </tr>
           ))}
+        </tbody>
+      </table>
+
+      {/* TABLA DE FICHEROS */}
+
+      <h2 className="text-lg font-bold mt-8">Ficheros asignados</h2>
+      <table className="min-w-full bg-white border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="py-2 px-4 border">Pantalla</th>
+            <th className="py-2 px-4 border">Usuario</th>
+            <th className="py-2 px-4 border">imagenes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ficheros.length > 0 ? (
+            ficheros.map((fichero, index) => (
+              <tr key={fichero.id_asignar || index} className="border-b">
+                <td className="px-4 py-2 border">{fichero.nombre_pantalla}</td>
+                <td className="px-4 py-2 border">{fichero.nombre_usuario}</td>
+                <td className="px-4 py-2 border">{fichero.id_archivos}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" className="text-center py-2 border">
+                No hay archivos asignados
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
