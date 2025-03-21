@@ -29,10 +29,11 @@ function HomeUsuario() {
           {archivos.length > 0 && (
             <div>
               <img
-                src={archivos[currentIndex].ruta.startsWith('http') ? archivos[currentIndex].ruta : `http://localhost${archivos[currentIndex].ruta}`} // Verifica si la ruta ya es completa
-                alt={archivos[currentIndex].nombre} // Nombre de la imagen
-                className="w-full h-64 object-cover"
-              />
+                src={`http://localhost/${archivos[currentIndex].ruta.replace(/\\/g, "/")}`}
+               alt={archivos[currentIndex].nombre}
+               className="w-full h-64 object-cover"
+                />
+
               <p className="mt-2">Fecha: {archivos[currentIndex].fecha} | Hora: {archivos[currentIndex].hora}</p>
             </div>
           )}
