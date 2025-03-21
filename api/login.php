@@ -2,53 +2,58 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
 
-include "conexion.php";
+// Mostrar errores para depurar
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$input = file_get_contents("php://input");
-$data = json_decode($input, true);
+include 'conexion.php'; // asegúrate que este archivo hace return $conn
 
-if (!isset($data['accion']) || !isset($data['usuario']) || !isset($data['password'])) {
-    echo json_encode(["status" => "error", "message" => "Datos incompletos"]);
-    exit();
+// Obtener los datos enviados desde el frontend
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!$input) {
+    echo json_encode(["status" => "error", "message" => "No se recibieron datos"]);
+    exit;
 }
 
-$accion = $data['accion'];
-$usuario = $data['usuario'];
-$password = $data['password'];
+$accion = $input['accion'] ?? '';
+$usuario = $input['usuario'] ?? '';
+$password = $input['password'] ?? '';
 
-if ($accion === "register") {
-    // Verifica si el usuario ya existe
-    $sql_check = $conn->prepare("SELECT nombre_usuario FROM usuarios WHERE nombre_usuario = ?");
-    $sql_check->bind_param("s", $usuario);
-    $sql_check->execute();
-    $result_check = $sql_check->get_result();
+if ($accion === 'login') {
+    // Ajusta el nombre del campo correcto en tu query
+    $stmt = $conn->prepare("SELECT rol FROM usuarios WHERE nombre_usuario = ? AND password = ?");
+    $stmt->bind_param("ss", $usuario, $password);
+    $stmt->execute();
 
-    if ($result_check->num_rows > 0) {
-        echo json_encode(["status" => "error", "message" => "El usuario ya existe"]);
-        exit();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        echo json_encode(["status" => "success", "rol" => $user['rol']]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Usuario o contraseña incorrectos"]);
     }
 
-    // Inserta el nuevo usuario en la base de datos
-    $sql_insert = $conn->prepare("INSERT INTO usuarios (nombre_usuario, password, rol) VALUES (?, ?, 'usuario')");
-    $sql_insert->bind_param("ss", $usuario, $password);
+    $stmt->close();
 
-    if ($sql_insert->execute()) {
+} elseif ($accion === 'register') {
+    // Aquí también el nombre del campo debe coincidir
+    $stmt = $conn->prepare("INSERT INTO usuarios (nombre_usuario, password, rol) VALUES (?, ?, 'usuario')");
+    $stmt->bind_param("ss", $usuario, $password);
+
+    if ($stmt->execute()) {
         echo json_encode(["status" => "success", "message" => "Usuario registrado exitosamente"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Error al registrar el usuario"]);
+        echo json_encode(["status" => "error", "message" => "Error al registrar usuario"]);
     }
-} elseif ($accion === "login") {
-    $sql = $conn->prepare("SELECT rol FROM usuarios WHERE nombre_usuario = ? AND password = ?");
-    $sql->bind_param("ss", $usuario, $password);
-    $sql->execute();
-    $result = $sql->get_result();
 
-    if ($row = $result->fetch_assoc()) {
-        echo json_encode(["status" => "success", "rol" => $row['rol']]);
-    } else {
-        echo json_encode(["status" => "fail", "message" => "Usuario o contraseña incorrectos"]);
-    }
+    $stmt->close();
+} else {
+    echo json_encode(["status" => "error", "message" => "Acción no válida"]);
 }
 
 $conn->close();
