@@ -9,17 +9,21 @@ function HomeUsuario() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch('http://localhost/galeria/api/files.php');
-        if (!response.ok) throw new Error('Error al cargar las imágenes');
+        const response = await fetch('http://localhost/galeria/api/verFicheros.php');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al cargar las imágenes: ${errorText}`);
+        }
 
         const data = await response.json();
-        if (Array.isArray(data.files)) {
-          setArchivos(data.files);
+        if (Array.isArray(data.ficheros)) {
+          setArchivos(data.ficheros);
         } else {
           console.error('El formato de respuesta no es válido:', data);
         }
       } catch (error) {
         console.error('Error al cargar las imágenes:', error);
+        alert('Error al cargar las imágenes. Por favor, inténtalo de nuevo más tarde.');
       }
     };
 
@@ -82,7 +86,7 @@ function HomeUsuario() {
           {archivos.length > 0 ? (
             <div className="flex flex-col items-center">
               <img
-                src={`http://localhost${archivos[currentIndex].ruta.replace(/\\/g, '/')}`}
+                src={`http://localhost/galeria/uploads/${archivos[currentIndex].ruta.replace(/\\/g, '/')}`}
                 alt={archivos[currentIndex].nombre}
                 className="w-full h-64 object-cover rounded-lg"
               />
