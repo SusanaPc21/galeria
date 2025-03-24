@@ -16,13 +16,13 @@ if (!isset($data['usuario']) || !isset($data['password'])) {
 $usuario = $data['usuario'];
 $password = $data['password'];
 
-$sql = $conn->prepare("SELECT rol FROM usuarios WHERE usuario = ? AND password = ?");
+$sql = $conn->prepare("SELECT id, rol FROM usuarios WHERE nombre_usuario = ? AND password = ?");
 $sql->bind_param("ss", $usuario, $password);
 $sql->execute();
 $result = $sql->get_result();
 
 if ($row = $result->fetch_assoc()) {
-    echo json_encode(["status" => "success", "rol" => $row['rol']]); // Retorna el rol
+    echo json_encode(["status" => "success", "rol" => $row['rol'], 'id' => $row['id']]); // Retorna el rol
 } else {
     echo json_encode(["status" => "fail", "message" => "Usuario o contraseña incorrectos"]);
 }

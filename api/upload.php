@@ -31,7 +31,8 @@ if (move_uploaded_file($_FILES['file']['tmp_name'], $rutaDestino)) {
     $hora = date('H:i:s');
 
     // Guardar la ruta completa para la base de datos
-    $rutaDB = 'upload/' . $rutaDestino;
+    $rutaDB = $rutaDestino;
+
 
     // Insertar en la base de datos
     $stmt = $conn->prepare("INSERT INTO archivos (ruta, nombre, fecha, hora) VALUES (?, ?, ?, ?)");

@@ -25,6 +25,7 @@ function Login() {
 
         // Guardar rol en localStorage o estado global si lo deseas
         localStorage.setItem('rol', data.rol);
+        localStorage.setItem('id', data.id);
 
         // Redirigir según el rol
         if (data.rol === 'admin') {
