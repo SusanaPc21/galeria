@@ -4,7 +4,11 @@ import './carrusel.css';
 
 function HomeUsuario() {
   const [carruseles, setCarruseles] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [archivos, setArchivos] = useState([]); // Imágenes cargadas desde el servidor
+  const [isPlaying, setIsPlaying] = useState(true); // Controla si el carrusel se reproduce automáticamente
 
+  // Cargar las imágenes desde la API al montar el componente
   useEffect(() => {
     // Obtener el ID del usuario desde localStorage
     const id = localStorage.getItem('id');
@@ -23,12 +27,33 @@ function HomeUsuario() {
         setCarruseles(data.carruseles || []);
       })
       .catch((error) => console.error('Error al cargar las imágenes:', error));
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('http://localhost/galeria/api/verFicheros.php');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al cargar las imágenes: ${errorText}`);
+        }
+
+        const data = await response.json();
+        if (Array.isArray(data.ficheros)) {
+          setArchivos(data.ficheros);
+        } else {
+          console.error('El formato de respuesta no es válido:', data);
+        }
+      } catch (error) {
+        console.error('Error al cargar las imágenes:', error);
+        alert('Error al cargar las imágenes. Por favor, inténtalo de nuevo más tarde.');
+      }
+    };
+
+    fetchImages();
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Bienvenido, Usuario</h1>
-      <h2 className="text-2xl font-bold mb-4">Galería</h2>
+    <div className="p-4 flex flex-col items-center">
+      <h1 className="text-3xl font-bold mb-2">Bienvenido, Usuario</h1>
+      <h2 className="text-2xl font-semibold mb-4">Galería de Imágenes</h2>
 
       {carruseles.length === 0 ? (
         <p>No hay carruseles asignados.</p>
