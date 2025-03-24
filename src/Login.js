@@ -45,10 +45,12 @@ function Login() {
   return (
     <div className="container">
       <div className="login-box">
-        <h2>Login</h2>
+        <h2>Iniciar sesión</h2>
         <form onSubmit={handleSubmit}>
-          <input type="text" value={usuario} onChange={(e) => setUsuario(e.target.value)} required />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <input type="text" value={usuario} onChange={(e) => setUsuario(e.target.value)} placeholder="Usuario" 
+           required />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Usuario" 
+           required />
           <button type="submit">Ingresar</button>
         </form>
         {mensaje && <p>{mensaje}</p>}

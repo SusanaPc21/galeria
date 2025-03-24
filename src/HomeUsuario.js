@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import  './Login.js';
+import { useNavigate } from 'react-router-dom';
+import './Login.js';
 import './carrusel.css';
 
 function HomeUsuario() {
   const [carruseles, setCarruseles] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Obtener el ID del usuario desde localStorage
     const id = localStorage.getItem('id');
     console.log('ID del usuario:', id);
 
-    // Validar que el ID exista
     if (!id) {
       console.error('No se encontró el ID del usuario en localStorage');
       return;
     }
 
-    // Llamada al backend con el ID dinámico
     fetch(`http://localhost/galeria/api/carrusel.php?usuario_id=${id}`)
       .then((response) => response.json())
       .then((data) => {
@@ -25,8 +24,19 @@ function HomeUsuario() {
       .catch((error) => console.error('Error al cargar las imágenes:', error));
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('id');
+    navigate('/');
+  };
+
   return (
-    <div className="p-4">
+    <div className="p-4 relative">
+      <button
+        className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded"
+        onClick={handleLogout} 
+      >
+        Salir
+      </button>
       <h1 className="text-2xl font-bold mb-4">Bienvenido, Usuario</h1>
       <h2 className="text-2xl font-bold mb-4">Galería</h2>
 

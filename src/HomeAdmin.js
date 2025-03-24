@@ -12,6 +12,12 @@ function HomeAdmin() {
   const [screenName, setScreenName] = useState('');
   const [uploading, setUploading] = useState(false); // Add a state to handle upload status
 
+  const handleLogout = () => {
+    localStorage.removeItem('id');
+    window.location.href = '/';
+  };
+
+
   // PARTE SUBIR ARCHIVOS
 
   const handleFileChange = (e) => {
@@ -192,6 +198,12 @@ function HomeAdmin() {
 
   return (
     <div className="p-4">
+      <button 
+        className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded"
+        onClick={handleLogout}
+      >
+        Salir
+      </button>
       <h1 className="text-xl font-bold mb-4">Bienvenido, Administrador</h1>
 
       <input type="file" onChange={handleFileChange} className="mb-4" />
