@@ -79,3 +79,18 @@
     border-color: #2a5298;
   }
   
+  /* Centrar el título principal */
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* Centrar los subtítulos */
+h2, h3 {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}

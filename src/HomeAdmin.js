@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './admin.css';
 
 function HomeAdmin() {
   const [file, setFile] = useState(null);
