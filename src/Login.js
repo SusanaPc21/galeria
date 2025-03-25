@@ -49,7 +49,7 @@ function Login() {
         <form onSubmit={handleSubmit}>
           <input type="text" value={usuario} onChange={(e) => setUsuario(e.target.value)} placeholder="Usuario" 
            required />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Usuario" 
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" 
            required />
           <button type="submit">Ingresar</button>
         </form>
